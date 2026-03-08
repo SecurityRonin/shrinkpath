@@ -21,8 +21,19 @@ jobs:
         with:
           toolchain: ${{ matrix.rust }}
       - uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2
-      - run: cargo test --lib
-      - run: cargo test --doc
+      # MSRV job: test lib only (no clap, which requires newer rustc)
+      - name: Test lib (no default features)
+        if: matrix.rust != 'stable'
+        run: cargo test --no-default-features --lib
+      - name: Test lib (default features)
+        if: matrix.rust == 'stable'
+        run: cargo test --lib
+      - name: Test lib (fs feature)
+        if: matrix.rust == 'stable'
+        run: cargo test --features fs --lib
+      - name: Doc-tests
+        if: matrix.rust == 'stable'
+        run: cargo test --doc
 
   clippy:
     runs-on: ubuntu-latest
@@ -33,6 +44,7 @@ jobs:
           components: clippy
       - uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2
       - run: cargo clippy --all-targets -- -D warnings
+      - run: cargo clippy --all-targets --features fs -- -D warnings
 
   fmt:
     runs-on: ubuntu-latest
