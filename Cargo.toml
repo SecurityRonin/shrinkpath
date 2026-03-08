@@ -1,13 +1,13 @@
 [package]
 name = "shrinkpath"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "Smart cross-platform path shortening for CLIs, prompts, and tools"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/SecurityRonin/shrinkpath"
 homepage = "https://github.com/SecurityRonin/shrinkpath"
 readme = "README.md"
-keywords = ["path", "shorten", "cli", "prompt", "filesystem"]
+keywords = ["path", "shorten"]
 categories = ["command-line-utilities", "filesystem"]
 rust-version = "1.70"
 
