@@ -17,6 +17,7 @@ clap = { version = "4", features = ["derive"], optional = true }
 [features]
 default = ["cli"]
 cli = ["clap"]
+fs = []
 
 [[bin]]
 name = "shrinkpath"

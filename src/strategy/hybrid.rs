@@ -10,7 +10,12 @@ use crate::strategy::fish::abbreviate_segment;
 /// Phase 4: Fish-abbreviate identity segments (last resort).
 ///
 /// Never touches filename or prefix.
-pub fn shrink_hybrid(info: &PathInfo, max_len: usize, ellipsis: &str) -> String {
+pub fn shrink_hybrid(
+    info: &PathInfo,
+    max_len: usize,
+    ellipsis: &str,
+    anchors: &[String],
+) -> String {
     if info.segments.is_empty() {
         return info.reassemble(&[]);
     }
@@ -35,7 +40,7 @@ pub fn shrink_hybrid(info: &PathInfo, max_len: usize, ellipsis: &str) -> String 
     // Phase 1: Fish expendable segments
     for (i, priority) in priorities.iter().enumerate() {
         if *priority == SegmentPriority::Expendable {
-            working[i] = abbreviate_segment(&info.segments[i].text);
+            working[i] = abbreviate_segment(&info.segments[i].text, 1, anchors);
         }
     }
     let refs: Vec<&str> = working.iter().map(|s| s.as_str()).collect();
@@ -47,7 +52,7 @@ pub fn shrink_hybrid(info: &PathInfo, max_len: usize, ellipsis: &str) -> String 
     // Phase 2: Fish context segments
     for (i, priority) in priorities.iter().enumerate() {
         if *priority == SegmentPriority::Context {
-            working[i] = abbreviate_segment(&info.segments[i].text);
+            working[i] = abbreviate_segment(&info.segments[i].text, 1, anchors);
         }
     }
     let refs: Vec<&str> = working.iter().map(|s| s.as_str()).collect();
@@ -70,7 +75,7 @@ pub fn shrink_hybrid(info: &PathInfo, max_len: usize, ellipsis: &str) -> String 
     // Phase 4: Fish identity segments (last resort)
     for (i, priority) in priorities.iter().enumerate() {
         if *priority == SegmentPriority::Identity {
-            working[i] = abbreviate_segment(&info.segments[i].text);
+            working[i] = abbreviate_segment(&info.segments[i].text, 1, anchors);
         }
     }
 
@@ -150,13 +155,13 @@ mod tests {
     #[test]
     fn already_short() {
         let info = PathInfo::parse("/home/user/file.txt", None);
-        assert_eq!(shrink_hybrid(&info, 50, "..."), "/home/user/file.txt");
+        assert_eq!(shrink_hybrid(&info, 50, "...", &[]), "/home/user/file.txt");
     }
 
     #[test]
     fn phase1_fish_expendable() {
         let info = PathInfo::parse("/home/john/projects/rust/myapp/src/main.rs", None);
-        let result = shrink_hybrid(&info, 35, "...");
+        let result = shrink_hybrid(&info, 35, "...", &[]);
         // Should fish expendable segments first
         assert!(result.len() <= 35, "got len {}: {}", result.len(), result);
         assert!(result.ends_with("main.rs"));
@@ -172,7 +177,7 @@ mod tests {
             "/home/john/projects/rust/myapp/src/deep/nested/main.rs",
             None,
         );
-        let result = shrink_hybrid(&info, 30, "...");
+        let result = shrink_hybrid(&info, 30, "...", &[]);
         assert!(result.len() <= 30, "got len {}: {}", result.len(), result);
         assert!(result.ends_with("main.rs"));
     }
@@ -183,7 +188,7 @@ mod tests {
             "C:\\Users\\Admin\\AppData\\Local\\Temp\\deep\\file.txt",
             None,
         );
-        let result = shrink_hybrid(&info, 35, "...");
+        let result = shrink_hybrid(&info, 35, "...", &[]);
         assert!(result.len() <= 35, "got len {}: {}", result.len(), result);
         assert!(result.ends_with("file.txt"));
         // Should try to preserve Admin
@@ -196,7 +201,7 @@ mod tests {
     #[test]
     fn tilde_hybrid() {
         let info = PathInfo::parse("~/projects/rust/app/src/lib.rs", None);
-        let result = shrink_hybrid(&info, 25, "...");
+        let result = shrink_hybrid(&info, 25, "...", &[]);
         assert!(result.len() <= 25, "got len {}: {}", result.len(), result);
         assert!(result.ends_with("lib.rs"));
     }
@@ -204,7 +209,7 @@ mod tests {
     #[test]
     fn filename_exceeds() {
         let info = PathInfo::parse("/a/b/c/very_long_filename.txt", None);
-        let result = shrink_hybrid(&info, 10, "...");
+        let result = shrink_hybrid(&info, 10, "...", &[]);
         assert_eq!(result, "very_long_filename.txt");
     }
 
@@ -214,7 +219,7 @@ mod tests {
             "/Users/john/Library/Application Support/Code/User/settings.json",
             None,
         );
-        let result = shrink_hybrid(&info, 45, "...");
+        let result = shrink_hybrid(&info, 45, "...", &[]);
         assert!(result.len() <= 45, "got len {}: {}", result.len(), result);
         assert!(result.ends_with("settings.json"));
         assert!(
@@ -229,7 +234,7 @@ mod tests {
             ".\\Users\\Admin\\AppData\\Local\\Packages\\Microsoft.MicrosoftEdge\\file.txt",
             None,
         );
-        let result = shrink_hybrid(&info, 40, "...");
+        let result = shrink_hybrid(&info, 40, "...", &[]);
         assert!(result.len() <= 40, "got len {}: {}", result.len(), result);
         assert!(result.ends_with("file.txt"));
     }

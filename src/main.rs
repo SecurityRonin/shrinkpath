@@ -38,6 +38,7 @@ fn parse_strategy(s: &str) -> Strategy {
         "ellipsis" | "e" => Strategy::Ellipsis,
         "fish" | "f" => Strategy::Fish,
         "hybrid" | "h" => Strategy::Hybrid,
+        "unique" | "u" => Strategy::Unique,
         _ => {
             eprintln!("Unknown strategy '{s}', using hybrid");
             Strategy::Hybrid
