@@ -5,14 +5,14 @@
   "type": "module",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs"
     },
     "./fs": {
+      "types": "./dist/fs-aware.d.ts",
       "import": "./dist/fs-aware.mjs",
-      "require": "./dist/fs-aware.cjs",
-      "types": "./dist/fs-aware.d.ts"
+      "require": "./dist/fs-aware.cjs"
     }
   },
   "main": "./dist/index.cjs",
@@ -49,6 +49,7 @@
     "node": ">=18"
   },
   "devDependencies": {
+    "@types/node": "^25.5.0",
     "tsup": "^8",
     "typescript": "^5",
     "vitest": "^3"
