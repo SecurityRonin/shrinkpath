@@ -1,28 +1,35 @@
 {
-  "name": "shrinkpath",
+  "name": "@4n6h4x0r/shrinkpath",
   "version": "0.1.0",
   "description": "Smart cross-platform path shortening for CLIs, prompts, and tools",
   "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
+      "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
     "./fs": {
       "types": "./dist/fs-aware.d.ts",
-      "import": "./dist/fs-aware.mjs",
+      "import": "./dist/fs-aware.js",
       "require": "./dist/fs-aware.cjs"
     }
   },
   "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
     "dist/",
     "README.md",
-    "LICENSE"
+    "LICENSE-MIT",
+    "LICENSE-APACHE"
   ],
+  "author": "4n6h4x0r",
+  "homepage": "https://github.com/SecurityRonin/shrinkpath/tree/main/ts#readme",
+  "bugs": {
+    "url": "https://github.com/SecurityRonin/shrinkpath/issues"
+  },
+  "sideEffects": false,
   "scripts": {
     "build": "tsup",
     "test": "vitest run",
@@ -50,6 +57,7 @@
   },
   "devDependencies": {
     "@types/node": "^25.5.0",
+    "@vitest/coverage-v8": "^3.2.4",
     "tsup": "^8",
     "typescript": "^5",
     "vitest": "^3"

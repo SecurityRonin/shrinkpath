@@ -1,8 +1,9 @@
 # shrinkpath
 
-**Smart cross-platform path shortening for Rust.**
+**Smart cross-platform path shortening for Rust and JavaScript/TypeScript.**
 
 [![Crates.io](https://img.shields.io/crates/v/shrinkpath.svg)](https://crates.io/crates/shrinkpath)
+[![npm](https://img.shields.io/npm/v/@4n6h4x0r/shrinkpath.svg)](https://www.npmjs.com/package/@4n6h4x0r/shrinkpath)
 [![docs.rs](https://img.shields.io/docsrs/shrinkpath)](https://docs.rs/shrinkpath)
 [![CI](https://github.com/SecurityRonin/shrinkpath/actions/workflows/ci.yml/badge.svg)](https://github.com/SecurityRonin/shrinkpath/actions)
 [![License: MIT OR Apache-2.0](https://img.shields.io/crates/l/shrinkpath.svg)](#license)
@@ -25,7 +26,18 @@ adapts to fit your target length.
 - **Zero dependencies** &mdash; the library has no dependencies; `clap` is only pulled in for the optional CLI
 - **No filesystem access** &mdash; works on path strings alone, so it runs in WASM, embedded, or anywhere (opt-in `fs` feature for filesystem-aware disambiguation)
 
-## Quick Start
+## Packages
+
+| Platform | Package | Install |
+|---|---|---|
+| Rust | [crates.io/crates/shrinkpath](https://crates.io/crates/shrinkpath) | `cargo add shrinkpath` |
+| JavaScript/TypeScript | [@4n6h4x0r/shrinkpath](https://www.npmjs.com/package/@4n6h4x0r/shrinkpath) | `npm install @4n6h4x0r/shrinkpath` |
+
+Both packages have full feature parity. The npm package is a pure TypeScript
+implementation (not WASM) with zero dependencies. See [`ts/README.md`](ts/README.md)
+for JS/TS-specific documentation.
+
+## Quick Start (Rust)
 
 ```toml
 # Cargo.toml
