@@ -165,7 +165,7 @@ fn apply_mapped_locations(path: &str, mapped_locations: &[(String, String)]) -> 
 
     // Sort by longest from-prefix first
     let mut sorted: Vec<&(String, String)> = mapped_locations.iter().collect();
-    sorted.sort_by(|a, b| b.0.len().cmp(&a.0.len()));
+    sorted.sort_by_key(|entry| std::cmp::Reverse(entry.0.len()));
 
     for (from, to) in sorted {
         if path.starts_with(from.as_str()) {
