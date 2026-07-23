@@ -74,3 +74,42 @@ describe('PathInfo.reassemble', () => {
     expect(info.reassemble(texts)).toBe('C:\\Users\\Admin\\Docs\\file.txt');
   });
 });
+
+describe('PathInfo.parse edge cases', () => {
+  test('parse unc without trailing path', () => {
+    // UNC with server only, no backslash after server
+    const info = PathInfo.parse('\\\\server');
+    expect(info.prefix).toBe('\\\\server');
+    expect(info.filename).toBe('');
+    expect(info.segments).toHaveLength(0);
+  });
+
+  test('parse bare backslash prefix', () => {
+    const info = PathInfo.parse('\\dir\\file.txt');
+    expect(info.prefix).toBe('\\');
+    expect(info.filename).toBe('file.txt');
+    expect(info.segments[0].text).toBe('dir');
+  });
+
+  test('parse bare tilde', () => {
+    const info = PathInfo.parse('~');
+    expect(info.prefix).toBe('~');
+    expect(info.filename).toBe('');
+    expect(info.segments).toHaveLength(0);
+  });
+
+  test('parse relative windows path', () => {
+    // No prefix at all in windows mode
+    const info = PathInfo.parse('Users\\Admin\\file.txt');
+    expect(info.prefix).toBe('');
+    expect(info.style).toBe('windows');
+    expect(info.filename).toBe('file.txt');
+  });
+
+  test('parse unc with share only no trailing content', () => {
+    // \\server\share with nothing after
+    const info = PathInfo.parse('\\\\server\\share');
+    expect(info.prefix).toBe('\\\\server\\share');
+    expect(info.filename).toBe('');
+  });
+});

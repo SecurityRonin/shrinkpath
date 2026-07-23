@@ -56,10 +56,9 @@ export function shrinkHybridStrategy(
     }
   }
 
-  if (working.length > 2) {
-    const collapsed = collapseMiddle(working, info, maxLen, ellipsis);
-    if (collapsed.length <= maxLen) return collapsed;
-  }
+  // Note: post-phase4 collapse attempt is omitted because collapseMiddle's
+  // loop minimum (keepHead=0/keepTail=0) doesn't use working segments, so
+  // identity fishing cannot improve it — if phase 3 failed, this would too.
 
   const sep = separator(info.style);
   const prefixSep = info.prefix !== '' ? sep : '';

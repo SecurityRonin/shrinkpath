@@ -48,4 +48,35 @@ describe('shrinkEllipsisStrategy', () => {
     expect(result).toMatch(/lib\.rs$/);
     expect(result).toContain('...');
   });
+
+  test('head plus ellipsis exceeds budget falls to minimal', () => {
+    // Identity segments (home/john) + ellipsis cost exceeds maxLen
+    // Forces the "fixedCost >= maxLen" branch → minimal prefix+...+filename
+    const info = PathInfo.parse('/home/john/a/b/c/file.rs');
+    const result = shrinkEllipsisStrategy(info, 16, '...');
+    expect(result.length).toBeLessThanOrEqual(16);
+    expect(result).toMatch(/file\.rs$/);
+  });
+
+  test('even minimal too long returns filename only', () => {
+    // prefix+...+filename is still too long — returns just filename
+    const info = PathInfo.parse('/home/john/a/b/c/file.rs');
+    const result = shrinkEllipsisStrategy(info, 10, '...');
+    expect(result).toBe('file.rs');
+  });
+
+  test('relative path with no prefix', () => {
+    // Empty prefix tests the prefix === '' branch in baseLen and fixedCost
+    const info = PathInfo.parse('a/b/c/d/e/file.txt');
+    const result = shrinkEllipsisStrategy(info, 15, '...');
+    expect(result.length).toBeLessThanOrEqual(15);
+    expect(result).toMatch(/file\.txt$/);
+  });
+
+  test('relative path minimal fallback', () => {
+    // Empty prefix, fixedCost >= maxLen — the prefixSep '' branch
+    const info = PathInfo.parse('documents/downloads/deep/nested/file.txt');
+    const result = shrinkEllipsisStrategy(info, 12, '...');
+    expect(result).toBe('.../file.txt');
+  });
 });

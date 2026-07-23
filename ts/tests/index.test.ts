@@ -164,4 +164,50 @@ describe('shrinkDetailed', () => {
     const result = shrinkDetailed('', { maxLen: 50 });
     expect(result.segments).toHaveLength(0);
   });
+
+  test('segment metadata with ellipsis collapse', () => {
+    // Triggers the buildSegmentMetadata branch where origSegCount !== shortSegCount
+    // and an ellipsis marker is present in the shortened segments
+    const result = shrinkDetailed('/home/john/a/b/c/d/e/src/lib.rs', {
+      maxLen: 25,
+      strategy: 'ellipsis',
+    });
+    expect(result.wasTruncated).toBe(true);
+    expect(result.segments.length).toBeGreaterThan(0);
+    // Should contain at least one segment marked as collapsed
+    const collapsed = result.segments.filter(s => s.shortened === '...');
+    expect(collapsed.length).toBeGreaterThan(0);
+    expect(collapsed.every(s => s.wasAbbreviated)).toBe(true);
+    // Last segment should be filename
+    const last = result.segments[result.segments.length - 1];
+    expect(last.isFilename).toBe(true);
+    expect(last.original).toBe('lib.rs');
+  });
+
+  test('segment metadata with hybrid collapse', () => {
+    // Hybrid with tight budget triggers collapse — different segment counts
+    const result = shrinkDetailed(
+      '/home/john/projects/rust/myapp/src/deep/nested/lib.rs',
+      { maxLen: 25 },
+    );
+    expect(result.wasTruncated).toBe(true);
+    expect(result.shortenedLen).toBeLessThanOrEqual(25);
+    const last = result.segments[result.segments.length - 1];
+    expect(last.isFilename).toBe(true);
+  });
+
+  test('segment metadata different counts no ellipsis marker fallback', () => {
+    // Unicode ellipsis bypasses the ASCII '...'/'..'' detection in buildSegmentMetadata
+    // causing segment counts to differ without a recognized ellipsis marker
+    const result = shrinkDetailed('/home/john/a/b/c/d/e/src/lib.rs', {
+      maxLen: 25,
+      strategy: 'ellipsis',
+      ellipsis: '\u2026', // Unicode ellipsis '…', not ASCII '...'
+    });
+    expect(result.wasTruncated).toBe(true);
+    expect(result.segments.length).toBeGreaterThan(0);
+    const last = result.segments[result.segments.length - 1];
+    expect(last.isFilename).toBe(true);
+    expect(last.original).toBe('lib.rs');
+  });
 });

@@ -37,4 +37,18 @@ describe('shrinkUniqueStrategy', () => {
     const info = PathInfo.parse('/home/john/src/lib.rs');
     expect(shrinkUniqueStrategy(info, ['src'])).toBe('/h/j/src/lib.rs');
   });
+
+  test('shorter sibling during prefix comparison', () => {
+    // "ab" vs "a" — when prefix len=2, "a" is shorter than len, so it's automatically unique
+    const info = PathInfo.parse('/a/ab/file.txt');
+    const result = shrinkUniqueStrategy(info, []);
+    expect(result).toBe('/a/ab/file.txt'); // identical prefix "a" — "a" can't be shortened, "ab" needs full
+  });
+
+  test('segments with varying lengths', () => {
+    // Tests the otherChars.length < len branch explicitly
+    const info = PathInfo.parse('/x/xy/xyz/file.txt');
+    const result = shrinkUniqueStrategy(info, []);
+    expect(result).toBe('/x/xy/xyz/file.txt'); // all share prefix "x"
+  });
 });

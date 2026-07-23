@@ -39,6 +39,17 @@ describe('findGitRoot', () => {
     expect(root).toBe(expected);
   });
 
+  test('find git root from directory', () => {
+    dir = tempDir('git_dir');
+    mkdirSync(join(dir, 'src/deep'), { recursive: true });
+    mkdirSync(join(dir, '.git'));
+
+    // Pass directory (not file) — covers stat.isFile() false branch
+    const root = findGitRoot(join(dir, 'src/deep'));
+    const expected = dir.split('/').pop()!;
+    expect(root).toBe(expected);
+  });
+
   test('find git root not found returns null', () => {
     dir = tempDir('git_notfound');
     mkdirSync(dir, { recursive: true });
@@ -79,6 +90,13 @@ describe('disambiguateSegment', () => {
 
     expect(disambiguateSegment(dir, 'app')).toBe('app');
     expect(disambiguateSegment(dir, 'application')).toBe('appl');
+  });
+
+  test('disambiguate empty segment no siblings', () => {
+    dir = tempDir('disambig_empty_seg');
+    mkdirSync(dir, { recursive: true });
+    // No subdirectories → siblings empty → segment === '' branch
+    expect(disambiguateSegment(dir, '')).toBe('');
   });
 
   test('disambiguate unreadable dir', () => {
