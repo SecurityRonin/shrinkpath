@@ -17,7 +17,7 @@ url = "https://raw.githubusercontent.com/google/rust-crate-audits/main/audits.to
 url = "https://raw.githubusercontent.com/mozilla/supply-chain/main/audits.toml"
 
 [policy.shrinkpath]
-audit-as-crates-io = true
+audit-as-crates-io = false
 
 [[exemptions.anstream]]
 version = "0.6.21"
@@ -65,10 +65,6 @@ criteria = "safe-to-deploy"
 
 [[exemptions.once_cell_polyfill]]
 version = "1.70.2"
-criteria = "safe-to-deploy"
-
-[[exemptions.shrinkpath]]
-version = "0.1.1"
 criteria = "safe-to-deploy"
 
 [[exemptions.syn]]
