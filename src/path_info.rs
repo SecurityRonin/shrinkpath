@@ -50,18 +50,18 @@ impl PathInfo {
         // Split remaining path into parts
         let parts: Vec<&str> = remainder.split(sep).filter(|s| !s.is_empty()).collect();
 
-        if parts.is_empty() {
+        // Last part is the filename (sacred); everything before it is directories.
+        // `split_last` yields both in one step, so the empty case needs no separate
+        // guard and neither the index nor `parts.len() - 1` can go out of range.
+        let Some((filename, dir_parts)) = parts.split_last() else {
             return PathInfo {
                 prefix,
                 segments: Vec::new(),
                 filename: String::new(),
                 style,
             };
-        }
-
-        // Last part is the filename (sacred)
-        let filename = parts.last().unwrap().to_string();
-        let dir_parts = &parts[..parts.len() - 1];
+        };
+        let filename = (*filename).to_string();
 
         // Classify segments
         let segments = classify_segments(dir_parts, &prefix, style);

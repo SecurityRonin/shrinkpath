@@ -16,7 +16,10 @@ pub fn find_git_root(path: &str) -> Option<String> {
     let mut current = start;
     loop {
         if current.join(".git").exists() {
-            return current.file_name()?.to_str().map(|s| s.to_string());
+            return current
+                .file_name()?
+                .to_str()
+                .map(std::string::ToString::to_string);
         }
         current = current.parent()?;
     }
@@ -28,8 +31,8 @@ pub fn find_git_root(path: &str) -> Option<String> {
 pub fn disambiguate_segment(parent_path: &Path, segment: &str) -> String {
     let siblings: Vec<String> = match std::fs::read_dir(parent_path) {
         Ok(entries) => entries
-            .filter_map(|e| e.ok())
-            .filter(|e| e.file_type().map(|t| t.is_dir()).unwrap_or(false))
+            .filter_map(std::result::Result::ok)
+            .filter(|e| e.file_type().is_ok_and(|t| t.is_dir()))
             .filter_map(|e| e.file_name().into_string().ok())
             .filter(|name| name != segment)
             .collect(),
@@ -37,11 +40,11 @@ pub fn disambiguate_segment(parent_path: &Path, segment: &str) -> String {
     };
 
     if siblings.is_empty() {
-        // No siblings — 1 char is enough
-        if segment.is_empty() {
-            return String::new();
-        }
-        return segment.chars().next().unwrap().to_string();
+        // No siblings — 1 char is enough; an empty segment has no first char.
+        return segment
+            .chars()
+            .next()
+            .map_or_else(String::new, |c| c.to_string());
     }
 
     for len in 1..=segment.len() {

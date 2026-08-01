@@ -13,7 +13,9 @@ pub fn abbreviate_segment(text: &str, len: usize, anchors: &[String]) -> String 
         return text.to_string();
     }
     let mut chars = text.chars();
-    let first = chars.next().unwrap();
+    let Some(first) = chars.next() else {
+        return String::new();
+    };
     if first == '.' {
         let after_dot: String = chars.take(len).collect();
         if after_dot.is_empty() {
@@ -21,10 +23,12 @@ pub fn abbreviate_segment(text: &str, len: usize, anchors: &[String]) -> String 
         }
         return format!(".{after_dot}");
     }
-    // Take `len` chars total (first + len-1 more)
+    // Take `len` chars total (first + len-1 more). `dir_length` is caller-supplied,
+    // so len == 0 must saturate rather than underflow; the leading char still
+    // survives, mirroring the dot branch's "." at len == 0.
     let mut result = String::with_capacity(len);
     result.push(first);
-    for c in chars.take(len - 1) {
+    for c in chars.take(len.saturating_sub(1)) {
         result.push(c);
     }
     result
@@ -95,6 +99,16 @@ mod tests {
     #[test]
     fn abbreviate_empty() {
         assert_eq!(abbreviate_segment("", 1, &[]), "");
+    }
+
+    #[test]
+    fn abbreviate_zero_length_keeps_first_char() {
+        // `dir_length` is a public builder option, so len == 0 reaches here from
+        // safe user code. `chars.take(len - 1)` underflows usize for len == 0.
+        // Expected: the leading character survives, mirroring the dot branch,
+        // which already yields "." for a dotfile at len == 0.
+        assert_eq!(abbreviate_segment("projects", 0, &[]), "p");
+        assert_eq!(abbreviate_segment(".config", 0, &[]), ".");
     }
 
     #[test]

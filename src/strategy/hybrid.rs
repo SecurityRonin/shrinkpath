@@ -22,7 +22,7 @@ pub fn shrink_hybrid(
 
     // Full reassembly check
     let texts: Vec<String> = info.segments.iter().map(|s| s.text.clone()).collect();
-    let text_refs: Vec<&str> = texts.iter().map(|s| s.as_str()).collect();
+    let text_refs: Vec<&str> = texts.iter().map(std::string::String::as_str).collect();
     let full = info.reassemble(&text_refs);
     if full.len() <= max_len {
         return full;
@@ -43,7 +43,7 @@ pub fn shrink_hybrid(
             working[i] = abbreviate_segment(&info.segments[i].text, 1, anchors);
         }
     }
-    let refs: Vec<&str> = working.iter().map(|s| s.as_str()).collect();
+    let refs: Vec<&str> = working.iter().map(std::string::String::as_str).collect();
     let result = info.reassemble(&refs);
     if result.len() <= max_len {
         return result;
@@ -55,7 +55,7 @@ pub fn shrink_hybrid(
             working[i] = abbreviate_segment(&info.segments[i].text, 1, anchors);
         }
     }
-    let refs: Vec<&str> = working.iter().map(|s| s.as_str()).collect();
+    let refs: Vec<&str> = working.iter().map(std::string::String::as_str).collect();
     let result = info.reassemble(&refs);
     if result.len() <= max_len {
         return result;
@@ -193,7 +193,7 @@ mod tests {
         assert!(result.ends_with("file.txt"));
         // Should try to preserve Admin
         assert!(
-            result.contains("Admin") || result.contains("A"),
+            result.contains("Admin") || result.contains('A'),
             "should preserve identity somehow: {result}",
         );
     }
