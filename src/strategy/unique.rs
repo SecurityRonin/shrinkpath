@@ -92,7 +92,10 @@ pub fn shrink_unique(info: &PathInfo, anchors: &[String]) -> String {
         })
         .collect();
 
-    let refs: Vec<&str> = abbreviated.iter().map(|s| s.as_str()).collect();
+    let refs: Vec<&str> = abbreviated
+        .iter()
+        .map(std::string::String::as_str)
+        .collect();
     info.reassemble(&refs)
 }
 

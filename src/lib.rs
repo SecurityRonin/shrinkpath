@@ -1,3 +1,4 @@
+#![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 //! # shrinkpath
 //!
 //! Smart, cross-platform path shortening for Rust.
@@ -69,7 +70,7 @@ pub struct ShrinkOptions {
 }
 
 impl ShrinkOptions {
-    /// Create options with sensible defaults: Hybrid strategy, max_len as specified.
+    /// Create options with sensible defaults: Hybrid strategy, `max_len` as specified.
     pub fn new(max_len: usize) -> Self {
         ShrinkOptions {
             max_len,
@@ -84,42 +85,49 @@ impl ShrinkOptions {
     }
 
     /// Set the shortening strategy.
+    #[must_use]
     pub fn strategy(mut self, s: Strategy) -> Self {
         self.strategy = s;
         self
     }
 
     /// Force a specific path style.
+    #[must_use]
     pub fn path_style(mut self, s: PathStyle) -> Self {
         self.path_style = Some(s);
         self
     }
 
     /// Set a custom ellipsis string.
+    #[must_use]
     pub fn ellipsis(mut self, e: impl Into<String>) -> Self {
         self.ellipsis = e.into();
         self
     }
 
     /// Set the number of characters to keep per abbreviated directory segment.
+    #[must_use]
     pub fn dir_length(mut self, n: usize) -> Self {
         self.dir_length = n;
         self
     }
 
     /// Set the number of trailing directory segments to keep unabbreviated.
+    #[must_use]
     pub fn full_length_dirs(mut self, n: usize) -> Self {
         self.full_length_dirs = n;
         self
     }
 
     /// Add a mapped location: if the path starts with `from`, replace it with `to`.
+    #[must_use]
     pub fn map_location(mut self, from: impl Into<String>, to: impl Into<String>) -> Self {
         self.mapped_locations.push((from.into(), to.into()));
         self
     }
 
     /// Add an anchor segment name that should never be abbreviated.
+    #[must_use]
     pub fn anchor(mut self, name: impl Into<String>) -> Self {
         self.anchors.push(name.into());
         self
@@ -239,7 +247,7 @@ pub fn shrink_detailed(path: &str, opts: &ShrinkOptions) -> ShrinkResult {
     }
 }
 
-/// Build per-segment metadata by comparing original and shortened PathInfo.
+/// Build per-segment metadata by comparing original and shortened `PathInfo`.
 fn build_segment_metadata(
     original: &path_info::PathInfo,
     shortened: &path_info::PathInfo,
@@ -495,6 +503,16 @@ mod tests {
     }
 
     #[test]
+    fn dir_length_zero_does_not_panic() {
+        // `dir_length(0)` is accepted by the builder, so it must behave, not panic.
+        let opts = ShrinkOptions::new(50)
+            .strategy(Strategy::Fish)
+            .dir_length(0);
+        let result = shrink("/home/john/projects/rust/myapp/src/lib.rs", &opts);
+        assert_eq!(result, "/h/j/p/r/m/s/lib.rs");
+    }
+
+    #[test]
     fn full_length_dirs_one() {
         let opts = ShrinkOptions::new(50)
             .strategy(Strategy::Fish)
@@ -552,7 +570,7 @@ mod tests {
     fn mapped_location_windows() {
         let opts = ShrinkOptions::new(50).map_location("C:\\Users\\Admin", "~");
         let result = shrink("C:\\Users\\Admin\\Documents\\file.txt", &opts);
-        assert!(result.starts_with("~"), "got: {result}");
+        assert!(result.starts_with('~'), "got: {result}");
         assert!(result.ends_with("file.txt"));
     }
 

@@ -1,5 +1,6 @@
 use clap::Parser;
 use shrinkpath::{shrink, shrink_detailed, PathStyle, ShrinkOptions, Strategy};
+use std::fmt::Write as _;
 use std::io::{self, BufRead, Write};
 
 #[derive(Parser)]
@@ -86,7 +87,9 @@ fn json_escape(s: &str) -> String {
             '\r' => out.push_str("\\r"),
             '\t' => out.push_str("\\t"),
             c if c < '\x20' => {
-                out.push_str(&format!("\\u{:04x}", c as u32));
+                // Writing to a String is infallible; the Result exists only to satisfy
+                // the fmt::Write signature.
+                let _ = write!(out, "\\u{:04x}", c as u32);
             }
             c => out.push(c),
         }
