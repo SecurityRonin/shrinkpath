@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.3](https://github.com/SecurityRonin/shrinkpath/compare/shrinkpath-v0.1.2...shrinkpath-v0.1.3) - 2026-08-05
+
+### Fixed
+
+- *(fish)* saturate dir_length(0); adopt canonical lints
+
 ## [0.1.2](https://github.com/SecurityRonin/shrinkpath/compare/shrinkpath-v0.1.1...shrinkpath-v0.1.2) - 2026-07-25
 
 ### Added
